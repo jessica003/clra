@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+body{
+  font-family: Roboto;
+}
+table.table-bordered > tbody > tr > td,table.table-bordered > tbody > tr > th,table.table-bordered > thead > tr > th{
+  border:1px solid black;
+  font-size: 14px;
+  text-align: center;
+  font-family: Roboto;
+}
+nav{
+	background-color: lightgrey!important;
+}
+.nav-link{
+	color: black!important;
+}
