@@ -94,8 +94,8 @@
               <td>{{date('M-Y', strtotime($auditlist->audit_to))}}</td>
               <td>Scheduled</td>
               <td>Pending</td>
-              <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-view-iv/'.$auditlist->id)}}">View</a></td>
-              <!-- <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->audit_type}}" data-id="{{$auditlist->id}}">Add</a></td> -->
+              <!-- <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-view-iv/'.$auditlist->id)}}">View</a></td> -->
+              <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->audit_type)}}">Add</a></td>
             </tr>
             @endforeach
           </tbody>
@@ -364,49 +364,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       @include('layouts.csrf-js');
-      $(document).ready(function(){
-          $(".addauditfileclraaudit").on("click", function(){
-            var auditId = $(this).attr("data-id");
-            $.ajax({
-              url: "/contractor-add-ca",
-              type: "POST",
-              data: {auditId: auditId},
-              dataType: 'JSON',
-              success: function(data){
-                console.log(data);
-                $('.conaddform').html('');
-                $('.conaddform').append(data.html);
-            }});
-          });
-          $(".addauditfileinvoiceverification").on("click", function(){
-            var auditId = $(this).attr("data-id");
-            $.ajax({
-              url: "/contractor-add-iv",
-              type: "POST",
-              data: {auditId: auditId},
-              dataType: 'JSON',
-              success: function(data){
-                console.log(data);
-                $('.conaddform').html('');
-                $('.conaddform').append(data.html);
-                $('.audit_id').val(data.auditId);
-            }});
-          });
-          // $(".viewauditfileinvoiceverification").on("click", function(){
-          //   var auditId = $(this).attr("data-id");
-          //   $.ajax({
-          //     url: "/contractor-view-iv",
-          //     type: "GET",
-          //     data: {auditId: auditId},
-          //     dataType: 'JSON',
-          //     success: function(data){
-          //       console.log(data);
-          //       $('.conaddform').html('');
-          //       $('.conaddform').append(data.html);
-          //       $('.audit_id').val(data.auditId);
-          //   }});
-          // });
-      });
     </script>
   </body>
 </html>

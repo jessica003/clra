@@ -45,6 +45,7 @@ class ContractorController extends Controller
     public function store(Request $request)
     {
        $data = $request->all();
+       dd($data);
        $created_by = User::where('user_id','=', session('LoggedUser'))->pluck('user_id')->first();
        foreach ($data as $key => $value) {
         preg_match_all('/[A-Z]/', $key, $matches, PREG_OFFSET_CAPTURE);
@@ -124,18 +125,15 @@ class ContractorController extends Controller
     {
         //
     }
-    public function conaddca(Request $request)
+    public function conaddiv($id,$audittype)
     {
-        $auditDet = AuditScheduler::where('audit_schedulers.id',$request->auditId)
-                        ->get();
-        $auditcol = DB::table('audit_columns')->where('audit_type_id',2)->get();
-        $html = view('layouts.contractoraddca',compact('auditDet','auditcol'))->render();
-        return response()->json(['html'=>$html]);
-    }
-    public function conaddiv(Request $request)
-    {       
+        if ($audittype=='invoiceverification') {
+            $auditTypeId = '1';
+        }else{
+            $auditTypeId = '2';
+        }
         $auditDet= AuditScheduler::join('comply_live_db.users as dt','audit_schedulers.contractor_id','dt.user_id')
-                                  ->where('audit_schedulers.id',$request->auditId)
+                                  ->where('audit_schedulers.id',$id)
                                   ->select('audit_schedulers.*','dt.user_name')
                                   ->get();
         foreach ($auditDet as $audit) {            
@@ -145,9 +143,8 @@ class ContractorController extends Controller
                  array_push($month, $dt->format("M-Y"));
             }
         }
-        $auditcol = DB::table('audit_columns')->where('audit_type_id',1)->get();
-        $html = view('layouts.contractoraddiv',compact('auditDet','auditcol','month'))->render();
-        return response()->json(['html'=>$html,'auditId'=>$request->auditId]);
+        $auditcol = DB::table('audit_columns')->where('audit_type_id',$auditTypeId)->get();
+        return view('layouts.contractoradd',compact('auditDet','auditcol','month','audittype','id'));
     }
     public function conviewiv(Request $request,$id)
     { 
