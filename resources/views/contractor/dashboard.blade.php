@@ -94,8 +94,8 @@
               <td>{{date('M-Y', strtotime($auditlist->audit_to))}}</td>
               <td>Scheduled</td>
               <td>Pending</td>
-              <!-- <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-view-iv/'.$auditlist->id)}}">View</a></td> -->
-              <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->audit_type)}}">Add</a></td>
+              <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-view-iv/'.$auditlist->id)}}">View</a></td>
+              <!-- <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->audit_type)}}">Add</a></td> -->
             </tr>
             @endforeach
           </tbody>
