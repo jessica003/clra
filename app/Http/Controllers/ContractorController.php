@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use DB;
 use Auth;
 use Response;
 use App\Models\User;
 use App\Models\Company;
-use App\Models\CompanyAddress;
-use App\Models\Contractor;
-use App\Models\AuditScheduler;
 use App\Models\AuditFile;
+use App\Models\Contractor;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\AuditScheduler;
+use App\Models\CompanyAddress;
+use Illuminate\Support\Facades\DB;
 
 class ContractorController extends Controller
 {
@@ -148,22 +148,42 @@ class ContractorController extends Controller
     }
     public function conviewiv(Request $request,$id)
     { 
-        $auditCol = DB::table('audit_columns')
-                        ->where('audit_type_id',1)
-                        ->get();
-        $auditDet= AuditScheduler::join('comply_live_db.users as dt','audit_schedulers.contractor_id','dt.user_id')
-                                  ->where('audit_schedulers.id',$id)
-                                  ->select('audit_schedulers.*','dt.user_name')
-                                  ->get();
-        foreach ($auditDet as $audit) {            
-            $period = \Carbon\CarbonPeriod::create($audit->audit_from, '1 month', $audit->audit_to);
-            $month = [];
-            foreach ($period as $dt) {
-                 array_push($month, $dt->format("M-Y"));
-            }
-        }
+        // $auditCol = DB::table('audit_columns')
+        //                 ->where('audit_type_id',1)
+        //                 ->get();
+        // $auditDet= AuditScheduler::join('comply_live_db.users as dt','audit_schedulers.contractor_id','dt.user_id')
+        //                           ->where('audit_schedulers.id',$id)
+        //                           ->select('audit_schedulers.*','dt.user_name')
+        //                           ->get();
+        // foreach ($auditDet as $audit) {            
+        //     $period = \Carbon\CarbonPeriod::create($audit->audit_from, '1 month', $audit->audit_to);
+        //     $month = [];
+        //     foreach ($period as $dt) {
+        //          array_push($month, $dt->format("M-Y"));
+        //     }
+        // }
         // dd($month);
-        return view('layouts.contractorviewiv',compact('auditCol','month','auditDet'));
+        // return view('layouts.contractorviewiv',compact('auditCol','month','auditDet'));
+        $audits = AuditScheduler::from('audit_schedulers as AUD')
+        ->join('audit_files as AF', function ($join) {
+            $join->on('AUD.id', '=', 'AF.particular_id')
+                ->whereBetween('AF.particular_date', [DB::raw('AUD.audit_from'), DB::raw('AUD.audit_to')])
+                ->orWhere('AF.particular_date', '=', DB::raw('AUD.audit_to'));
+        })
+        ->join('audit_columns as AC', function ($join) {
+            $join->on('AF.audit_id', '=', 'AC.id');
+        })
+        ->join('comply_live_db.users as USR', function ($join) {
+            $join->on('AUD.contractor_id', '=', 'USR.user_id');
+        })
+        ->where([
+            'AC.audit_type_id'=> 1,
+            'AUD.id'=> $id
+        ])
+        ->orderBy('AC.column_name')
+        ->orderBy('AF.particular_date')
+        ->get();
+        return view('layouts.contractorviewiv2',compact('audits'));
     }
 }
 
