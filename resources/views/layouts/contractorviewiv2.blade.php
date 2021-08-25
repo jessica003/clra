@@ -19,8 +19,11 @@
 			@php $rowspan=0; $columnName=''; $parDate=null; @endphp
 			@foreach($audits as $key => $audit)
 				@if($key == 0)
-					@php $rowspan=1; @endphp
-					<p>Client Name: {{$audit->user_name}}<br>Audit Period: {{date('M-Y', strtotime($audit->audit_from))}} - {{date('M-Y', strtotime($audit->audit_to))}}</p><hr>
+					@php $rowspan=1; 
+					$auditFrom = isset($audit->audit_from) ? date('M-Y', strtotime($audit->audit_from)) : '-'; 
+					$auditTo = isset($audit->audit_to) ? date('M-Y', strtotime($audit->audit_to)) : '-'; 
+					@endphp
+					<p>Client Name: {{$audit->user_name}}<br>Audit Period: {{$auditFrom}} - {{$auditTo}}</p><hr>
 					
 					<table class="table table-bordered table-responsive" border="1">
 						<thead>
@@ -52,7 +55,8 @@
 							<td></td>
 						@endif
 						@if($parDate != $audit->particular_date || $columnName != $audit->column_name)
-							<td rowspan="">{{date('M-Y', strtotime($audit->particular_date))}}</td>
+						@php $parDate = isset($audit->particular_date) ? date('M-Y', strtotime($audit->particular_date)) : '-'; @endphp
+							<td rowspan="">{{$parDate}}</td>
 							@else
 							<td></td>
 						@endif

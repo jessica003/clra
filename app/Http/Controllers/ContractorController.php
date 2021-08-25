@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Models\AuditFile;
 use App\Models\Contractor;
+use App\Models\AuditColumn;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\AuditScheduler;
@@ -164,20 +165,20 @@ class ContractorController extends Controller
         // }
         // dd($month);
         // return view('layouts.contractorviewiv',compact('auditCol','month','auditDet'));
-        $audits = AuditScheduler::from('audit_schedulers as AUD')
-        ->join('audit_files as AF', function ($join) {
-            $join->on('AUD.id', '=', 'AF.particular_id')
+        $audits = AuditColumn::from('audit_columns as AC')
+        ->leftJoin('audit_schedulers as AUD', function ($join) {
+            $join->on('AC.fk_audit_type_id', '=', 'AUD.fk_audit_type_id');
+        })
+        ->leftJoin('audit_files as AF', function ($join) {
+            $join->on('AC.id', '=', 'AF.particular_id')
                 ->whereBetween('AF.particular_date', [DB::raw('AUD.audit_from'), DB::raw('AUD.audit_to')])
                 ->orWhere('AF.particular_date', '=', DB::raw('AUD.audit_to'));
         })
-        ->join('audit_columns as AC', function ($join) {
-            $join->on('AF.audit_id', '=', 'AC.id');
-        })
-        ->join('comply_live_db.users as USR', function ($join) {
+        ->leftJoin('comply_live_db.users as USR', function ($join) {
             $join->on('AUD.contractor_id', '=', 'USR.user_id');
         })
         ->where([
-            'AC.audit_type_id'=> 1,
+            'AC.fk_audit_type_id'=> DB::raw('AUD.fk_audit_type_id'),
             'AUD.id'=> $id
         ])
         ->orderBy('AC.column_name')
