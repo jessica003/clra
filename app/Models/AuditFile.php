@@ -13,8 +13,11 @@ class AuditFile extends Model
     ];
     public static function audFiles($auditId,$audDate,$audCol)
     {
-        dd($auditId.$audDate.$audCol);
+        $audFiles = AuditFile::where('audit_id',$auditId)
+                              ->where('particular_id',$audCol)
+                              ->where('particular_date',$audDate)
+                              ->first();
+        // dump($audFiles);
+        return $audFiles;
     }
 }
-
-
