@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use DB;
-use Auth;
 use Response;
 use App\Models\User;
 use App\Models\Company;
-use App\Models\CompanyAddress;
-use App\Models\Contractor;
-use App\Models\AuditScheduler;
+use Carbon\CarbonPeriod;
 use App\Models\AuditFile;
+use App\Models\Contractor;
 use App\Models\AuditColumn;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\AuditScheduler;
+use App\Models\CompanyAddress;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ContractorController extends Controller
 {
@@ -163,7 +164,7 @@ class ContractorController extends Controller
                                   ->select('audit_schedulers.*','dt.user_name')
                                   ->get();
         foreach ($auditDet as $audit) {            
-            $period = \Carbon\CarbonPeriod::create($audit->audit_from, '1 month', $audit->audit_to);
+            $period = CarbonPeriod::create($audit->audit_from, '1 month', $audit->audit_to);
             $month = [];
             foreach ($period as $dt) {
                  array_push($month, $dt->format("M-Y"));
@@ -190,25 +191,30 @@ class ContractorController extends Controller
         // }
         // // // dd($month);
         // return view('layouts.contractorviewiv-old',compact('auditCol','month','auditDet','audittype'));
+        
         $audits = AuditColumn::from('audit_columns as AC')
                     ->leftJoin('audit_schedulers as AUD', function ($join) {
                         $join->on('AC.fk_audit_type_id', '=', 'AUD.fk_audit_type_id');
                     })
                     ->leftJoin('audit_files as AF', function ($join) {
-                        $join->on('AC.id', '=', 'AF.particular_id')
-                            ->whereBetween('AF.particular_date', [DB::raw('AUD.audit_from'), DB::raw('AUD.audit_to')])
-                            ->orWhere('AF.particular_date', '=', DB::raw('AUD.audit_to'));
+                        $join->on('AC.id', '=', 'AF.fk_audit_column_id')
+                            ->on('AUD.id', '=', 'AF.fk_audit_scheduler_id')
+                            ->whereBetween('AF.particular_date', [DB::raw('AUD.audit_from'), DB::raw('AUD.audit_to')]);
+                            // ->orWhere('AF.particular_date', '=', DB::raw('AUD.audit_to'));
                     })
                     ->leftJoin('comply_live_db.users as USR', function ($join) {
                         $join->on('AUD.contractor_id', '=', 'USR.user_id');
                     })
+                    ->select('AC.id as audit_col_id', 'AC.column_name', 'AUD.id as audit_sch_id', 'AF.*')
+                    
                     ->where([
                         'AC.fk_audit_type_id'=> DB::raw('AUD.fk_audit_type_id'),
-                        'AUD.id'=> $id
+                        'AUD.id'=> $id,
+                        'USR.user_id' => session('LoggedUser')
                     ])
                     ->orderBy('AC.id')
                     ->orderBy('AF.particular_date')
-                    ->groupBy('AF.particular_id','AC.column_name','AF.particular_date')
+                    ->groupBy('AC.id','AF.particular_date')
                     ->get();
         // dd($audits);
         return view('layouts.contractorviewiv',compact('audits','audittype'));

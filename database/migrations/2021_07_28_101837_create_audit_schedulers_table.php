@@ -14,17 +14,19 @@ class CreateAuditSchedulersTable extends Migration
     public function up()
     {
         Schema::create('audit_schedulers', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
-            $table->integer('site_id');
-            $table->integer('contractor_id');
+            $table->id(); //by default it is unsignedIteger not Big in laravel below 6 or 7
+            $table->unsignedInteger('company_id');
+            $table->unsignedInteger('site_id');
+            $table->unsignedInteger('contractor_id');
             $table->date('date_of_audit');
-            $table->string('audit_type');
+            $table->unsignedBigInteger('fk_audit_type_id');
             $table->date('audit_from');
             $table->date('audit_to');
             $table->boolean('status')->default(false);
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
+            $table->boolean('contractor_status')->default(0);
+            $table->unsignedInteger('created_by')->nullable();
+            $table->unsignedInteger('updated_by')->nullable();
+            $table->foreign('fk_audit_type_id')->references('id')->on('audit_types')->onDelete('cascade');
             $table->timestamps();
         });
     }
