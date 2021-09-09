@@ -27,7 +27,7 @@
 	@csrf
 	<div class="card mt-3">
 		<div class="card-header text-center">
-			{{$audittype == 'clraaudit' ? 'CLRA AUDIT' :'INVOICE VERIFICATION AUDIT'}}
+			{{$audittype == '2' ? 'CLRA AUDIT' :'INVOICE VERIFICATION AUDIT'}}
 		</div>
 		<div class="card-body" style="padding: 7px 1rem;">
 			@foreach($auditDet as $audit)
@@ -50,13 +50,13 @@
 						@foreach($month as $m)
 						<td style="text-align:left">
 							@if($audit->id=='1'||$audit->id=='17')						
-							<input type="text" name="{{$audit->id.$m}}" class="empnum">
+							<input type="text" name="{{$audit->id.$m}}" class="empnum" autocomplete="off">
 							@elseif($audit->id=='2'||$audit->id=='4'||$audit->id=='18'||$audit->id=='20'||$audit->id=='53'||$audit->id=='56'||$audit->id=='57'||$audit->id=='58'||$audit->id=='59'||$audit->id=='64'||$audit->id=='65'||$audit->id=='66'||$audit->id=='67'||$audit->id=='68'||$audit->id=='69'||$audit->id=='70'||$audit->id=='84'||$audit->id=='85'||$audit->id=='86')
 								<input type="file" name="{{$audit->id.$m}}" class="{{$audit->id.$m}} infile" data-id="{{$audit->id.$m}}">
 								<input type="checkbox" name="na{{$audit->id.$m}}" class="na{{$audit->id.$m}} na" data-id="{{$audit->id.$m}}">
 								<label for="na" class="na{{$audit->id.$m}}">NA</label>
 							@elseif($audit->id=='3'||$audit->id=='19')
-								<input type="text" class="blackborder mt-1" name="datefilter">
+								<input type="text" class="blackborder mt-1 datefilter" name="{{$audit->id.$m}}" autocomplete="off" data-id="{{$audit->id.$m}}">
 							@elseif($audit->id=='37')							
 								<div class="radio">
 								  <label><input type="radio" name="{{$audit->id.$m}}" value="We Provide">We Provide</label>
@@ -69,7 +69,7 @@
 							@endif
 						</td>
 						@endforeach
-						<td><textarea rows="1" style="width:100%"></textarea></td>
+						<td><textarea rows="1" name="remarks{{$audit->id}}" class="remarks" style="width:100%"></textarea></td>
 					</tr>
 					@endforeach
 				</tbody>
@@ -88,16 +88,16 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
 	$(function() {
-	  $('input[name="datefilter"]').daterangepicker({
+	  $('.datefilter').daterangepicker({
 	      autoUpdateInput: false,
 	      locale: {
 	          cancelLabel: 'Clear'
 	      }
 	  });
-	  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+	  $('.datefilter').on('apply.daterangepicker', function(ev, picker) {
 	      $(this).val(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format('DD-MM-YYYY'));
 	  });
-	  $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+	  $('.datefilter').on('cancel.daterangepicker', function(ev, picker) {
 	      $(this).val('');
 	  });
 	});

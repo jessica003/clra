@@ -9,8 +9,12 @@ class AuditFile extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'audit_id', 'particular_id', 'particular_date', 'particular_file', 'text_content', 'clra_from', 'clra_to', 'na', 'created_by','updated_by','status'
+        'audit_id', 'particular_id', 'particular_date', 'particular_file', 'text_content', 'clra_from', 'clra_to', 'na', 'created_by','updated_by','status','remarks'
     ];
+    public static function audFiles($auditId,$audDate,$audCol)
+    {
+        dd($auditId.$audDate.$audCol);
+    }
 }
 
 

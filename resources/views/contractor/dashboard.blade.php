@@ -89,13 +89,13 @@
               <td>{{date('d-m-Y', strtotime($auditlist->date_of_audit))}}</td>
               <td>{{$auditlist->company_name}}</td>
               <td>{{$auditlist->company_office_loc_name}}</td>
-              <td>{{$auditlist->audit_type}}</td>
+              <td>{{$auditlist->fk_audit_type_id==2 ? 'CLRA AUDIT' : 'INVOICE VERIFICATION'}}</td>
               <td>{{date('M-Y', strtotime($auditlist->audit_from))}}</td>
               <td>{{date('M-Y', strtotime($auditlist->audit_to))}}</td>
               <td>Scheduled</td>
               <td>Pending</td>
-              <!-- <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-view-iv/'.$auditlist->id)}}">View</a></td> -->
-              <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->audit_type}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->audit_type)}}">Add</a></td>
+              <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-view-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">View</a></td>
+              <!-- <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">Add</a></td> -->
             </tr>
             @endforeach
           </tbody>

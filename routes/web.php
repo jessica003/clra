@@ -30,7 +30,7 @@ Route::get('/logout',[AuthController::class, 'logout'])->name('auth.logout');
 
 
 Route::group(['middleware'=>['AuthCheck']], function(){
-    Route::get('/contractor-view-iv/{id}',[ContractorController::class, 'conviewiv']);
+    Route::get('/contractor-view-iv/{id}/{audittype}',[ContractorController::class, 'conviewiv']);
     Route::get('/contractor-add-iv/{id}/{audittype}',[ContractorController::class, 'conaddiv']);
     // Route::post('/contractor-add-ca',[ContractorController::class, 'conaddca']);
     Route::post('/contractor-location',[AuditorController::class, 'conLoc']);
