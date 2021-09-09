@@ -15,16 +15,19 @@ class CreateAuditFilesTable extends Migration
     {
         Schema::create('audit_files', function (Blueprint $table) {
             $table->id();
-            $table->integer('audit_id');
-            $table->integer('particular_id');
+            $table->unsignedBigInteger('fk_audit_scheduler_id');
+            $table->unsignedBigInteger('fk_audit_column_id');
             $table->date('particular_date');
             $table->string('particular_file')->nullable();
             $table->string('text_content')->nullable();
             $table->date('clra_from');
             $table->date('clra_to');
             $table->boolean('na')->default(false);
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
+            $table->string('remarks')->nullable();
+            $table->unsignedInteger('created_by')->nullable();
+            $table->unsignedInteger('updated_by')->nullable();
+            $table->foreign('fk_audit_scheduler_id')->references('id')->on('audit_schedulers')->onDelete('cascade');
+            $table->foreign('fk_audit_column_id')->references('id')->on('audit_columns')->onDelete('cascade');
             $table->timestamps();
         });
     }
