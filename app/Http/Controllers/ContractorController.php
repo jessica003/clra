@@ -61,13 +61,13 @@ class ContractorController extends Controller
                 $particular_date = date("Y-m-01", strtotime($splittxt[1]));
                 if(str_starts_with($splittxt[0],"na")){
                     $splitna = explode('na',$splittxt[0]);
-                    $dataExists = AuditFile::where('audit_id',$request->audit_id)
-                                            ->where('particular_id',$splitna[1])->where('particular_date',$particular_date)->first();
-                    $auditdata = ['audit_id'=> $request->audit_id,'particular_id'=> $splitna[1],'particular_date'=> $particular_date,'created_by'=>$created_by,'na'=>1];
+                    $dataExists = AuditFile::where('fk_audit_scheduler_id',$request->audit_id)
+                                            ->where('fk_audit_column_id',$splitna[1])->where('particular_date',$particular_date)->first();
+                    $auditdata = ['fk_audit_scheduler_id'=> $request->audit_id,'fk_audit_column_id'=> $splitna[1],'particular_date'=> $particular_date,'created_by'=>$created_by,'na'=>1];
                 }else{
-                    $dataExists = AuditFile::where('audit_id',$request->audit_id)
-                                            ->where('particular_id',$splittxt[0])->where('particular_date',$particular_date)->first();
-                    $auditdata = ['audit_id'=> $request->audit_id,'particular_id'=> $splittxt[0],'particular_date'=> $particular_date,'created_by'=>$created_by];
+                    $dataExists = AuditFile::where('fk_audit_scheduler_id',$request->audit_id)
+                                            ->where('fk_audit_column_id',$splittxt[0])->where('particular_date',$particular_date)->first();
+                    $auditdata = ['fk_audit_scheduler_id'=> $request->audit_id,'fk_audit_column_id'=> $splittxt[0],'particular_date'=> $particular_date,'created_by'=>$created_by,'na'=>0];
                 }
                 if ($request->file($key)!=''){
                     $file = $request->file($key)->getClientOriginalName();
@@ -85,7 +85,7 @@ class ContractorController extends Controller
                         if ($value=='on') {
                             $value = NULL;
                         }
-                        $auditFile = array_merge($auditdata, ['text_content'=> $value]);                        
+                        $auditFile = array_merge($auditdata, ['text_content'=> $value,'particular_file'=> NULL]);                        
                     }
                 }
                 if($dataExists){
@@ -97,8 +97,8 @@ class ContractorController extends Controller
         }
         if(str_starts_with($key,"remarks")){
             $splitremarks = explode('remarks',$key);
-            $auditUpdate = AuditFile::where('audit_id',$request->audit_id)
-                                    ->where('particular_id',$splitremarks[1])
+            $auditUpdate = AuditFile::where('fk_audit_scheduler_id',$request->audit_id)
+                                    ->where('fk_audit_column_id',$splitremarks[1])
                                     ->update(['remarks'=>$value]);
         }
        }
@@ -205,7 +205,7 @@ class ContractorController extends Controller
                     ->leftJoin('comply_live_db.users as USR', function ($join) {
                         $join->on('AUD.contractor_id', '=', 'USR.user_id');
                     })
-                    ->select('AC.id as audit_col_id', 'AC.column_name', 'AUD.id as audit_sch_id', 'AF.*')
+                    ->select('AC.id as audit_col_id', 'AC.column_name', 'AUD.id as audit_sch_id', 'AUD.audit_from','AUD.audit_to','AF.*','USR.user_name')
                     
                     ->where([
                         'AC.fk_audit_type_id'=> DB::raw('AUD.fk_audit_type_id'),
@@ -216,8 +216,9 @@ class ContractorController extends Controller
                     ->orderBy('AF.particular_date')
                     ->groupBy('AC.id','AF.particular_date')
                     ->get();
-        // dd($audits);
-        return view('layouts.contractorviewiv',compact('audits','audittype'));
+        $contractorstatus = AuditScheduler::whereId($id)->pluck('contractor_status')->first();
+        // dd($contractorstatus);
+        return view('layouts.contractorviewiv',compact('audits','audittype','contractorstatus'));
     }
 }
 

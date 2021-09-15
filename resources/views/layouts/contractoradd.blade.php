@@ -23,6 +23,13 @@
 		width: 100%;
 	}
 </style>
+@if ($errors->any())
+  <div class="alert alert-danger mt-3">
+     <ul>
+      <li>Final submit cannot be done without filling all fields!</li>
+     </ul>
+  </div>
+@endif
 <form action="{{ route('contractor.store') }}" method="POST" enctype='multipart/form-data' class="formiv">	
 	@csrf
 	<div class="card mt-3">
@@ -50,13 +57,13 @@
 						@foreach($month as $m)
 						<td style="text-align:left">
 							@if($audit->id=='1'||$audit->id=='17')						
-							<input type="text" name="{{$audit->id.$m}}" class="empnum" autocomplete="off">
+							<input type="text" name="{{$audit->id.$m}}" class="empnum reqfile" autocomplete="off" required="">
 							@elseif($audit->id=='2'||$audit->id=='4'||$audit->id=='18'||$audit->id=='20'||$audit->id=='53'||$audit->id=='56'||$audit->id=='57'||$audit->id=='58'||$audit->id=='59'||$audit->id=='64'||$audit->id=='65'||$audit->id=='66'||$audit->id=='67'||$audit->id=='68'||$audit->id=='69'||$audit->id=='70'||$audit->id=='84'||$audit->id=='85'||$audit->id=='86')
 								<input type="file" name="{{$audit->id.$m}}" class="{{$audit->id.$m}} infile" data-id="{{$audit->id.$m}}">
 								<input type="checkbox" name="na{{$audit->id.$m}}" class="na{{$audit->id.$m}} na" data-id="{{$audit->id.$m}}">
 								<label for="na" class="na{{$audit->id.$m}}">NA</label>
 							@elseif($audit->id=='3'||$audit->id=='19')
-								<input type="text" class="blackborder mt-1 datefilter" name="{{$audit->id.$m}}" autocomplete="off" data-id="{{$audit->id.$m}}">
+								<input type="text" class="blackborder mt-1 datefilter reqfile" name="{{$audit->id.$m}}" autocomplete="off" data-id="{{$audit->id.$m}}">
 							@elseif($audit->id=='37')							
 								<div class="radio">
 								  <label><input type="radio" name="{{$audit->id.$m}}" value="We Provide">We Provide</label>
@@ -135,17 +142,27 @@
     }
 	});
 	$(".submitbtn").on("click", function(){
-	  if (confirm('You are about to do final submit. Are you sure?')) {
-	  	  $(".contractorstatus").val('1');
-	  		$(".formiv").submit();
-	  		alert('Submitted Successfully!');
-	  }
+		$(".reqfile").each(function(){
+			var inputvalue = $(this).val();
+			if (inputvalue=='') {
+				var valid ='no';
+				return false;
+			}
+		})
+		alert(valid);
+		if (valid!='no') {			
+			if (confirm('You are about to do final submit. You cannot make changes or add remaining files after this. Are you sure?')) {
+				  $(".contractorstatus").val('1');
+					$(".formiv").submit();
+					// alert('Submitted Successfully!');
+			}
+		}
 	});	
 	$(".savebtn").on("click", function(){
-	  if (confirm('It will save your files temporarily. Are you sure?')) {
+	  if (confirm('It will save your files temporarily.')) {
 	  	  $(".contractorstatus").val('0');
 		  	$(".formiv").submit();
-		  	alert('Saved Successfully!'); 
+		  	// alert('Saved Successfully!'); 
 	  }
 	});	
 </script>

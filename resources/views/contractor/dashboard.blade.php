@@ -82,7 +82,38 @@
           <tbody>
             @php $i=0; @endphp
             @foreach($auditlists as $auditlist)
-            @php $i++; @endphp
+            @php
+             $i++;
+             $auditDetails = \App\Models\AuditScheduler::find($auditlist->id);
+             $fileExist = $auditDetails->auditFiles;
+             $currentDate = date('Y-m-d');
+             if((count($fileExist)==0)){
+                if(($auditlist->date_of_audit)>$currentDate){
+                  $contractorStatus = 'Scheduled';
+                }else{                
+                  $contractorStatus = 'Pending';
+                }
+                $auditStatus = '-';
+             }else{
+                if($auditDetails->contractor_status==1){
+                  $contractorStatus = 'Uploaded';
+                  if($auditDetails->auditor_status==0){
+                    $auditStatus = 'Pending';
+                  }elseif($auditDetails->auditor_status==1){
+                    $auditStatus = 'Completed';
+                  }else{                
+                    $auditStatus = 'In Process';
+                  }
+                }
+                elseif($auditDetails->contractor_status==2){
+                  $contractorStatus = 'Reverted';
+                  $auditStatus = 'In Process';
+                }else{
+                  $contractorStatus = 'In Process';
+                  $auditStatus = '-';
+                }
+             }
+            @endphp
             <tr>
               <td>{{$i}}</td>
               <td>100{{$auditlist->id}}</td>
@@ -92,10 +123,25 @@
               <td>{{$auditlist->fk_audit_type_id==2 ? 'CLRA AUDIT' : 'INVOICE VERIFICATION'}}</td>
               <td>{{date('M-Y', strtotime($auditlist->audit_from))}}</td>
               <td>{{date('M-Y', strtotime($auditlist->audit_to))}}</td>
-              <td>Scheduled</td>
-              <td>Pending</td>
-              <td><a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-view-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">View</a></td>
-              <!-- <td><a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">Add</a></td> -->
+              <td>{{$contractorStatus}}</td>
+              <td>{{$auditStatus}}</td>
+              <td>
+                @if((count($fileExist)==0))
+                  @if(($auditlist->date_of_audit)>$currentDate)
+                    -
+                  @else               
+                    <a class="btn btn-sm btn-primary addbtn addauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-add-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">Add</a>
+                  @endif
+                @else
+                  @if($auditDetails->contractor_status==1)
+                    <a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-view-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">View</a>
+                  @elseif($auditDetails->contractor_status==2)
+                    <a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-view-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">Update</a>
+                  @else
+                    <a class="btn btn-sm btn-primary viewbtn viewauditfile{{$auditlist->fk_audit_type_id}}" href="{{url('/contractor-view-iv/'.$auditlist->id.'/'.$auditlist->fk_audit_type_id)}}">Update</a>
+                  @endif
+                @endif
+              </td>
             </tr>
             @endforeach
           </tbody>

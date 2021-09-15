@@ -9,10 +9,10 @@ class AuditScheduler extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'company_id', 'site_id', 'contractor_id', 'date_of_audit', 'fk_audit_type_id', 'audit_from', 'audit_to', 'created_by','updated_by','status','contractor_status'
+        'company_id', 'site_id', 'contractor_id', 'date_of_audit', 'fk_audit_type_id', 'audit_from', 'audit_to', 'created_by','updated_by','status','contractor_status','auditor_status'
     ];
 
-    // public function auditFiles() {
-    //     return $this->hasMany(AuditFile::class, 'audit_id');
-    // }
+    public function auditFiles() {
+        return $this->hasMany(AuditFile::class, 'fk_audit_scheduler_id');
+    }
 }

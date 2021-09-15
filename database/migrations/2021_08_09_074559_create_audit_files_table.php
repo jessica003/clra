@@ -15,8 +15,8 @@ class CreateAuditFilesTable extends Migration
     {
         Schema::create('audit_files', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('fk_audit_scheduler_id');
-            $table->unsignedBigInteger('fk_audit_column_id');
+            $table->unsignedBigInteger('fk_audit_scheduler_id')->nullable()->unsigned();
+            $table->unsignedBigInteger('fk_audit_column_id')->nullable()->unsigned();
             $table->date('particular_date');
             $table->string('particular_file')->nullable();
             $table->string('text_content')->nullable();
